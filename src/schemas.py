@@ -32,9 +32,9 @@ class ContactResponse(ContactBase):
 
 
 class UserModel(BaseModel):
-    username: str = Field(min_length=5, max_length=16)
+    username: str = Field(min_length=3, max_length=16)
     email: EmailStr
-    password: str = Field(min_length=6, max_length=10)
+    password: str = Field(min_length=6, max_length=16)
 
 
 class UserDb(BaseModel):
@@ -43,7 +43,7 @@ class UserDb(BaseModel):
     email: EmailStr
     created_at: datetime
     updated_at: datetime
-    avatar: str
+    avatar: str | None
 
     class Config:
         from_attributes = True

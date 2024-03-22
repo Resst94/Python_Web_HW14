@@ -1,6 +1,8 @@
+import os
 import time
 
 import redis.asyncio as redis
+import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi_limiter import FastAPILimiter
 from sqlalchemy import text
@@ -94,3 +96,7 @@ def healthchecker(db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error connecting to the database",
         )
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")

@@ -49,7 +49,7 @@ async def get_contact(contact_id: int, db: Session = Depends(get_db),
     return contact
 
 
-@router.get("/search/name", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/search/first_name", response_model=List[ContactResponse], description='No more than 10 requests per minute',
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts_first_name(first_name: str, db: Session = Depends(get_db),
                                   current_user: User = Depends(auth_service.get_current_user)):
@@ -68,7 +68,7 @@ async def get_contacts_first_name(first_name: str, db: Session = Depends(get_db)
     return contacts
 
 
-@router.get("/search/surname", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/search/last_name", response_model=List[ContactResponse], description='No more than 10 requests per minute',
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts_last_name(last_name: str, db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
