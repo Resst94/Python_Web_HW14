@@ -36,7 +36,8 @@ app.include_router(users.router, prefix='/api')
 async def startup():
     """
     The startup function is called when the application starts up.
-    It can be used to perform tasks that are needed before the application can serve requests, such as initializing a database connection or setting up caches.
+    It can be used to perform tasks that are needed before the application can serve requests, such as initializing a
+    database connection or setting up caches.
     
     :return: A coroutine, which is async
     """
@@ -99,4 +100,4 @@ def healthchecker(db: Session = Depends(get_db)):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")
+    uvicorn.run("main:app", host="localhost", port=int(os.environ.get("PORT", 8000)), log_level="info")
