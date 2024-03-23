@@ -10,6 +10,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
+from src.config import messages
 from src.config.config import settings
 from src.database.db import get_db
 from src.repository import users as repository_users
@@ -104,10 +105,10 @@ class Auth:
                 email = payload['sub']
                 return email
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid scope for token')
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.INVALID_SCOPE)
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail='Could not validate credentials')
+                                detail=messages.NOT_VALIDATE)
 
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         """
@@ -122,7 +123,7 @@ class Auth:
         """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail=messages.NOT_VALIDATE,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -193,7 +194,7 @@ async def get_email_from_token(self, token: str):
     except JWTError as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Invalid token for email verification")
+                            detail=messages.INVALID_TOKEN)
 
 
 auth_service = Auth()

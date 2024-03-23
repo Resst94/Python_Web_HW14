@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from sqlalchemy import select
 
+from src.config import messages
 from src.database.models import User
 from tests.conftest import TestingSessionLocal
 
@@ -28,7 +29,7 @@ def test_repeat_create_user(client, monkeypatch):
     )
     assert response.status_code == 409, response.text
     data = response.json()
-    assert data["detail"] == "Account already exists"
+    assert data["detail"] == messages.ACCOUNT_EXIST
 
 
 def test_login_user_not_confirmed(client):
@@ -38,7 +39,7 @@ def test_login_user_not_confirmed(client):
     )
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Email not confirmed"
+    assert data["detail"] == messages.EMAIL_NOT_CONFIRM
 
 
 def test_login_user(client, session):
@@ -65,7 +66,7 @@ def test_login_wrong_password(client):
     )
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Invalid password"
+    assert data["detail"] == messages.INVALID_PASSWORD
 
 
 def test_wrong_email_login(client):
@@ -73,7 +74,7 @@ def test_wrong_email_login(client):
                            data={"username": "email", "password": user_data.get("password")})
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Invalid email"
+    assert data["detail"] == messages.INVALID_EMAIL
 
 
 def test_validation_error_login(client):

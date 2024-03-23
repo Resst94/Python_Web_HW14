@@ -9,6 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.config import messages
 from src.config.config import settings
 from src.database.db import get_db
 from src.routes import contacts, auth, users
@@ -88,14 +89,14 @@ def healthchecker(db: Session = Depends(get_db)):
         if result is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database is not configured correctly",
+                detail=messages.DATABASE_ERROR,
             )
         return {"message": "Welcome to FastAPI!"}
     except Exception as e:
         print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error connecting to the database",
+            detail=messages.DATABASE_CONNECTION_ERROR,
         )
 
 

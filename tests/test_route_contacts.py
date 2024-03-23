@@ -2,6 +2,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 
 import pytest
 
+from src.config import messages
 from src.database.models import User
 from src.services.auth import auth_service
 
@@ -94,7 +95,7 @@ def test_read_contact_not_found(client, token, monkeypatch):
         )
         assert response.status_code == 404, response.text
         data = response.json()
-        assert data["detail"] == "Contact not found"
+        assert data["detail"] == messages.CONTACT_NOT_FOUND
 
 
 def test_update_contact_existing(client, token, monkeypatch):
@@ -141,7 +142,7 @@ def test_update_contact_not_found(client, token, monkeypatch):
         )
         assert response.status_code == 404, response.text
         data = response.json()
-        assert data["detail"] == "Contact not found"
+        assert data["detail"] == messages.CONTACT_NOT_FOUND
 
 
 def test_delete_contact_existing(client, token, monkeypatch):
@@ -174,4 +175,4 @@ def test_repeat_delete_contact(client, token, monkeypatch):
             )
             assert response.status_code == 404, response.text
             data = response.json()
-            assert data["detail"] == "Contact not found"
+            assert data["detail"] == messages.CONTACT_NOT_FOUND

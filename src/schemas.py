@@ -1,6 +1,8 @@
 from datetime import date, datetime
 from pydantic import BaseModel, Field, EmailStr
 
+from src.config import messages
+
 
 class ContactBase(BaseModel):
     first_name: str = Field(max_length=50)
@@ -51,7 +53,7 @@ class UserDb(BaseModel):
 
 class UserResponse(BaseModel):
     user: UserDb
-    detail: str = "User successfully created"
+    detail: str = messages.SUCCESSFULLY_CREATED
 
 
 class TokenModel(BaseModel):

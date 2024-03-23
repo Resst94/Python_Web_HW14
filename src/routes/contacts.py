@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 
+from src.config import messages
 from src.database.db import get_db
 from src.database.models import User
 from src.schemas import ContactModel, ContactUpdate, ContactResponse
@@ -13,7 +14,7 @@ from src.routes.auth import auth_service
 router = APIRouter(prefix='/contacts', tags=["contacts"])
 
 
-@router.get("/", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/", response_model=List[ContactResponse], description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts(skip: int = 0, limit: int = 100,
                        current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
@@ -30,7 +31,7 @@ async def get_contacts(skip: int = 0, limit: int = 100,
     return contacts
 
 
-@router.get("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
+@router.get("/{contact_id}", response_model=ContactResponse, description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contact(contact_id: int, db: Session = Depends(get_db),
                       current_user: User = Depends(auth_service.get_current_user)):
@@ -45,16 +46,19 @@ async def get_contact(contact_id: int, db: Session = Depends(get_db),
     contact = await repository_contacts.get_contact(contact_id, current_user, db)
     if contact is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contact
 
 
-@router.get("/search/first_name", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/search/first_name", response_model=List[ContactResponse], description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts_first_name(first_name: str, db: Session = Depends(get_db),
                                   current_user: User = Depends(auth_service.get_current_user)):
     """
-    The get_contacts_first_name function retrieves contacts from the database based on the provided first name. It uses the `get_contacts_first_name` method from the `repository_contacts` module to perform the database query. If no contacts are found, it raises an HTTPException with a status code of 404 and a detail message of &quot;Contact not found&quot;.
+    The get_contacts_first_name function retrieves contacts from the database based on the provided first name. It uses
+    the `get_contacts_first_name` method from the `repository_contacts` module to perform the database query. If no
+    contacts are found, it raises an HTTPException with a status code of 404 and a detail message of &quot;Contact not
+    found&quot;.
     
     :param first_name: str: Specify the first name of the contacts to search for
     :param db: Session: Pass the database session to the function
@@ -64,11 +68,11 @@ async def get_contacts_first_name(first_name: str, db: Session = Depends(get_db)
     contacts = await repository_contacts.get_contacts_first_name(first_name, current_user, db)
     if not contacts:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contacts
 
 
-@router.get("/search/last_name", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/search/last_name", response_model=List[ContactResponse], description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts_last_name(last_name: str, db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
@@ -83,11 +87,11 @@ async def get_contacts_last_name(last_name: str, db: Session = Depends(get_db),
     contacts = await repository_contacts.get_contacts_last_name(last_name, current_user, db)
     if not contacts:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contacts
 
 
-@router.get("/search/email", response_model=List[ContactResponse], description='No more than 10 requests per minute',
+@router.get("/search/email", response_model=List[ContactResponse], description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_contacts_email(email: str, db: Session = Depends(get_db),
                              current_user: User = Depends(auth_service.get_current_user)):
@@ -102,12 +106,12 @@ async def get_contacts_email(email: str, db: Session = Depends(get_db),
     contacts = await repository_contacts.get_contacts_email(email, current_user, db)
     if not contacts:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contacts
 
 
 @router.get("/search/birthdays", response_model=List[ContactResponse],
-            description='No more than 10 requests per minute',
+            description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def get_birthdays(db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)):
@@ -121,12 +125,12 @@ async def get_birthdays(db: Session = Depends(get_db),
     contacts = await repository_contacts.get_contacts_birthday(current_user, db)
     if not contacts:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contacts not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contacts
 
 
 @router.post("/", response_model=ContactResponse, status_code=status.HTTP_201_CREATED,
-             description='No more than 10 requests per minute',
+             description=messages.NO_MORE_THAN,
              dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def create_contact(body: ContactModel, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
@@ -141,7 +145,7 @@ async def create_contact(body: ContactModel, db: Session = Depends(get_db),
     return await repository_contacts.create_contact(body, current_user, db)
 
 
-@router.put("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
+@router.put("/{contact_id}", response_model=ContactResponse, description=messages.NO_MORE_THAN,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def update_contact(body: ContactUpdate, contact_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
@@ -157,11 +161,11 @@ async def update_contact(body: ContactUpdate, contact_id: int, db: Session = Dep
     contact = await repository_contacts.update_contact(contact_id, body, current_user, db)
     if contact is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contact
 
 
-@router.delete("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
+@router.delete("/{contact_id}", response_model=ContactResponse, description=messages.NO_MORE_THAN,
                dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def remove_contact(contact_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
@@ -176,5 +180,5 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db),
     contact = await repository_contacts.remove_contact(contact_id, current_user, db)
     if contact is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contact

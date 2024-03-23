@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 import pytest
 
+from src.config import messages
 from src.services.auth import Auth
 
 
@@ -41,12 +42,12 @@ async def test_get_current_user_invalid_token():
 
     # Mocking jwt.decode to raise JWTError
     with patch("src.services.auth.jwt.decode") as mock_jwt_decode:
-        mock_jwt_decode.side_effect = PyJWTError("Invalid token")
+        mock_jwt_decode.side_effect = PyJWTError(messages.INVALID_TOKEN)
 
         with pytest.raises(PyJWTError) as exc_info:
             await auth_instance.get_current_user(token, db)
 
-        assert "Invalid token" in str(exc_info.value)
+        assert messages.INVALID_TOKEN in str(exc_info.value)
 
 
 @pytest.mark.asyncio
@@ -68,4 +69,4 @@ async def test_get_current_user_invalid_scope():
             await auth_instance.get_current_user(token, db)
 
         assert exc_info.value.status_code == 401
-        assert exc_info.value.detail == "Could not validate credentials"
+        assert exc_info.value.detail == messages.NOT_VALIDATE
